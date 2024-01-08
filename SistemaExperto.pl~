@@ -2053,4 +2053,4 @@ desayuno(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina) :-
     Carbos is C1 + C2 + C3 + C4,
     Grasas is G1 + G2 + G3 + G4,
     Proteina is P1 + P2 + P3 + P4,
-    KCal = 700.  % Verifica la condición de las calorías
+    KCal = 2000.  % Verifica la condición de las calorías
