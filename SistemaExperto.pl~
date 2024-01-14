@@ -2044,13 +2044,29 @@ complementosySuplementosAlimenticios("SUPLEMENTO DE ALCACHOFA",87,8,5,2).
 complementosySuplementosAlimenticios("SUSPENSION DE CALCIO Y VITAMINA D",22,5,0,0).
 complementosySuplementosAlimenticios("VITANINO OPORTUNIDADES",0,0,0,0).
 
-desayuno(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina) :-
-    frutasFrescaseIndustrializadas(D1, K1, C1, G1, P1),
-    cerealesdeCajalistosparaConsumir(D2, K2, C2, G2, P2),
-    carnesBlancas(D3, K3, C3, G3, P3),
+:- dynamic solution_counter/1.
+
+desayuno(D1, D2, D3, D4, D5, D6, D7, KCal, Carbos, Grasas, Proteina) :-
+    cereales(D1, K1, C1, G1, P1),
+    lacteosyHuevos(D2, K2, C2, G2, P2),
+    frutasFrescaseIndustrializadas(D3, K3, C3, G3, P3),
     bebidas(D4, K4, C4, G4, P4),
-    KCal is K1 + K2 + K3 + K4,
-    Carbos is C1 + C2 + C3 + C4,
-    Grasas is G1 + G2 + G3 + G4,
-    Proteina is P1 + P2 + P3 + P4,
-    KCal = 2000.  % Verifica la condición de las calorías
+    aceitesyGrasas(D5, K5, C5, G5, P5),
+    carnesRojas(D6, K6, C6, G6, P6),
+    productosDePanificacion(D7, K7, C7, G7, P7),
+    KCal is K1 + K2 + K3 + K4 + K5 + K6 + K7,
+    Carbos is C1 + C2 + C3 + C4 + C5 + C6 + C7,
+    Grasas is G1 + G2 + G3 + G4 + G5 + G6 + G7,
+    Proteina is P1 + P2 + P3 + P4 + P5 + P6 + P7,
+    KCal == 623,
+
+    % Increment the solution counter
+    retract(solution_counter(Count)),
+    NewCount is Count + 1,
+    asserta(solution_counter(NewCount)),
+
+    % Stop searching after 10 solutions
+    (NewCount >=5 , ! ; true).
+
+% Initialize the solution counter
+:- asserta(solution_counter(0)).

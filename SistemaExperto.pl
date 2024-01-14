@@ -539,7 +539,7 @@ carnesRojas("RES VISCERAS PROMEDIO SESOS ESTOMAGO E INTESTINO HIGADO TRIPAS CORA
 carnesRojas("TERNERA CARNE EN CANAL",151,0,8,19).
 carnesRojas("VENADO CARNE ASADA",138,0,2,29).
 carnesRojas("VENADO CARNE MAGRA CRUDA",120,0,4,21).
-carnesBlancas("ARMADILLO PROMEDIO",165,0,5,29).
+carnesBlancas("POLLO PECHUGA SIN PIEL",120,0,2,22).
 carnesBlancas("CODORNIZ PROMEDIO",192,0,12,19).
 carnesBlancas("CONEJO DE CRIANZA PROMEDIO",154,0,8,20).
 carnesBlancas("GALLINA PROMEDIO",171,0,10,18).
@@ -570,11 +570,11 @@ carnesBlancas("POLLO MOLLEJAS",94,0,2,17).
 carnesBlancas("POLLO PATA",214,0,15,16).
 carnesBlancas("POLLO PECHUGA CON PIEL",181,0,11,20).
 carnesBlancas("POLLO PECHUGA EN BISTEC SIN HUESO Y SIN PIEL",120,0,2,22).
-carnesBlancas("POLLO PECHUGA SIN PIEL",120,0,2,22).
 carnesBlancas("POLLO PESCUEZO",297,0,26,14).
 carnesBlancas("POLLO PIERNA O MUSLO CON PIEL",237,0,18,16).
 carnesBlancas("POLLO PIERNA O MUSLO SIN PIEL",113,0,3,18).
 carnesBlancas("POLLO PROMEDIO DE HIGADO Y MOLLEJA",106,0,3,17).
+carnesBlancas("ARMADILLO PROMEDIO",165,0,5,29).
 pescadosyMariscos("ABULON",105,6,0,17).
 pescadosyMariscos("ALMEJAS SIN CONCHA",68,1,0,14).
 pescadosyMariscos("ANCHOAS",131,0,4,20).
@@ -2044,13 +2044,94 @@ complementosySuplementosAlimenticios("SUPLEMENTO DE ALCACHOFA",87,8,5,2).
 complementosySuplementosAlimenticios("SUSPENSION DE CALCIO Y VITAMINA D",22,5,0,0).
 complementosySuplementosAlimenticios("VITANINO OPORTUNIDADES",0,0,0,0).
 
-desayuno(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina) :-
+:- dynamic solution_counter/1.
+epsilon(0.001).
+
+desayuno(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
+    alimentos_desayuno(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina, TargetKCal).
+
+comida(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
+    alimentos_comida(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina, TargetKCal).
+
+colacion(D1, D2, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
+    alimentos_colacion(D1, D2, KCal, Carbos, Grasas, Proteina, TargetKCal).
+
+cena(D1, D2, D3, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
+    alimentos_cena(D1, D2, D3, KCal, Carbos, Grasas, Proteina, TargetKCal).
+
+% alimentos_cena(D1, D2, D3, KCal, Carbos, Grasas, Proteina, 415).
+
+
+% Common predicate for both desayuno and comida
+alimentos_desayuno(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
     frutasFrescaseIndustrializadas(D1, K1, C1, G1, P1),
-    cerealesdeCajalistosparaConsumir(D2, K2, C2, G2, P2),
-    carnesBlancas(D3, K3, C3, G3, P3),
-    bebidas(D4, K4, C4, G4, P4),
+    lacteosyHuevos(D2, K2, C2, G2, P2),
+    embutidos(D3, K3, C3, G3, P3),
+    productosDePanificacion(D4, K4, C4, G4, P4),
     KCal is K1 + K2 + K3 + K4,
     Carbos is C1 + C2 + C3 + C4,
     Grasas is G1 + G2 + G3 + G4,
     Proteina is P1 + P2 + P3 + P4,
-    KCal = 700.  % Verifica la condición de las calorías
+    epsilon(Epsilon),
+    abs(KCal - TargetKCal) =< Epsilon,
+    % Increment the solution counter
+    retract(solution_counter(Count)),
+    NewCount is Count + 1,
+    asserta(solution_counter(NewCount)),
+    % Stop searching after 200 solutions
+    (NewCount >= 200, ! ; true).
+
+alimentos_comida(D1, D2, D3, D4, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
+    pescadosyMariscos(D1, K1, C1, G1, P1),
+    cereales(D2, K2, C2, G2, P2),
+    leguminosas(D3, K3, C3, G3, P3),
+    verdurasFrescaseIndustrializadas(D4, K4, C4, G4, P4),
+    KCal is K1 + K2 + K3 + K4,
+    Carbos is C1 + C2 + C3 + C4,
+    Grasas is G1 + G2 + G3 + G4,
+    Proteina is P1 + P2 + P3 + P4,
+    epsilon(Epsilon),
+    abs(KCal - TargetKCal) =< Epsilon,
+    % Increment the solution counter
+    retract(solution_counter(Count)),
+    NewCount is Count + 1,
+    asserta(solution_counter(NewCount)),
+    % Stop searching after 200 solutions
+    (NewCount >= 200, ! ; true).
+
+alimentos_colacion(D1, D2, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
+    frutasFrescaseIndustrializadas(D1, K1, C1, G1, P1),
+    lacteosyHuevos(D2, K2, C2, G2, P2),
+    KCal is K1 + K2,
+    Carbos is C1 + C2,
+    Grasas is G1 + G2,
+    Proteina is P1 + P2,
+    epsilon(Epsilon),
+    abs(KCal - TargetKCal) =< Epsilon,
+    % Increment the solution counter
+    retract(solution_counter(Count)),
+    NewCount is Count + 1,
+    asserta(solution_counter(NewCount)),
+    % Stop searching after 200 solutions
+    (NewCount >= 200, ! ; true).
+
+alimentos_cena(D1, D2, D3, KCal, Carbos, Grasas, Proteina, TargetKCal) :-
+    frutasFrescaseIndustrializadas(D1, K1, C1, G1, P1),
+    cereales(D2, K2, C2, G2, P2),
+    carnesBlancas(D3, K3, C3, G3, P3),
+    KCal is K1 + K2 + K3 ,
+    Carbos is C1 + C2 + C3,
+    Grasas is G1 + G2 + G3,
+    Proteina is P1 + P2 + P3,
+    epsilon(Epsilon),
+    abs(KCal - TargetKCal) =< Epsilon,
+    % Increment the solution counter
+    retract(solution_counter(Count)),
+    NewCount is Count + 1,
+    asserta(solution_counter(NewCount)),
+    % Stop searching after 200 solutions
+    (NewCount >= 200, ! ; true).
+
+
+% Initialize the solution counter
+:- asserta(solution_counter(0)).
